@@ -2,6 +2,9 @@
 
 namespace App\Livewire;
 
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -11,20 +14,24 @@ use Livewire\Component;
 /**
  * @property-read Forms\Form $form
  */
-class Form extends Component implements HasForms
+class Form extends Component implements HasForms, HasActions
 {
     use InteractsWithForms;
+    use InteractsWithActions;
 
     /** @var array<string, mixed> */
     public $data = [];
 
     public function mount(): void
     {
-        if (! app()->environment('local')) {
-            abort(404);
-        }
-
         $this->form->fill();
+    }
+
+    public function testAction(): Action
+    {
+        return Action::make('test')
+            ->label(fn (array $arguments): string => "Test {$arguments['foo']}")
+            ->visible(fn (array $arguments): bool => $arguments['foo'] == 'bar');
     }
 
     /** @return Forms\Components\Component[] */
